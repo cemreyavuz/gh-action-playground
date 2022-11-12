@@ -4,5 +4,9 @@
   "main": "index.js",
   "repository": "git@github.com:cemreyavuz/gh-action-playground.git",
   "author": "Cüneyt Emre Yavuz <cuneyt.yavuz@cognite.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1"
+  }
 }

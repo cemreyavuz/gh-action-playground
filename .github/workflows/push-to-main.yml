@@ -1,4 +1,9 @@
-on: [push]
+name: Push to main
+on:
+  push:
+    branches:
+      - main
+
 
 jobs:
   hello_world_job:

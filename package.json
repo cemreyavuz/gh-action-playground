@@ -1,0 +1,8 @@
+{
+  "name": "gh-action-playground",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:cemreyavuz/gh-action-playground.git",
+  "author": "Cüneyt Emre Yavuz <cuneyt.yavuz@cognite.com>",
+  "license": "MIT"
+}

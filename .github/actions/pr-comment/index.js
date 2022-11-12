@@ -3,18 +3,15 @@ const github = require("@actions/github");
 
 async function run() {
   try {
-    const github_token = core.getInput('repo_token');
-    const pr_number = core.getInput('pr_number');
-    
+    const github_token = core.getInput("repo_token");
     const octokit = github.getOctokit(github_token);
 
-    const { data: pullRequest } = await octokit.rest.pulls.get({
-      repo: 'cemreyavuz/gh-action-playground',
-      pull_number: pr_number,
-  });
-
-  console.log(pullRequest);
-    
+    await octokit.rest.issues.createComment({
+      owner: github.context.issue.owner,
+      repo: github.context.issue.repo,
+      issue_number: github.context.issue.number,
+      body: "I can comment on PRs!",
+    });
   } catch (error) {
     core.setFailed(error.message);
   }

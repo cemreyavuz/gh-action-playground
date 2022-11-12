@@ -6,7 +6,8 @@
   "author": "Cüneyt Emre Yavuz <cuneyt.yavuz@cognite.com>",
   "license": "MIT",
   "scripts": {
-    "build": "ncc build index.js"
+    "build-hello-world": "ncc build .github/actions/hello-world/index.js",
+    "build-pr-comment": "ncc build .github/actions/pr-comment/index.js"
   },
   "dependencies": {
     "@actions/core": "^1.10.0",

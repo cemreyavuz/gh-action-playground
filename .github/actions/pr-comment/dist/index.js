@@ -9687,18 +9687,26 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(2186);
 const github = __nccwpck_require__(5438);
 
-try {
-  const nameToGreet = core.getInput("who-to-greet");
-  console.log(`Hello ${nameToGreet}!`);
+async function run() {
+  try {
+    const github_token = core.getInput('GITHUB_TOKEN');
+    const pr_number = core.getInput('pr_number');
+    
+    const octokit = github.getOctokit(github_token);
 
-  const time = new Date().toTimeString();
-  core.setOutput("time", time);
+    const { data: pullRequest } = await octokit.rest.pulls.get({
+      repo: 'cemreyavuz/gh-action-playground',
+      pull_number: pr_number,
+  });
 
-  const payload = JSON.stringify(github.context.payload, undefined, 2);
-  console.log(`The event payload: ${payload}`);
-} catch (error) {
-  core.setFailed(error.message);
+  console.log(pullRequest);
+    
+  } catch (error) {
+    core.setFailed(error.message);
+  }
 }
+
+run();
 
 })();
 

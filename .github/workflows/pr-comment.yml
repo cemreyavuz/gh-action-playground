@@ -11,7 +11,7 @@ jobs:
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Hello world action step
+      - name: Run pr-comment action
         id: hello
         uses: ./.github/actions/pr-comment
         with:

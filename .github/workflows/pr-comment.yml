@@ -14,3 +14,5 @@ jobs:
       - name: Hello world action step
         id: hello
         uses: ./.github/actions/pr-comment
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}

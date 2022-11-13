@@ -1,5 +1,9 @@
 name: 'PR Comment'
 description: 'Comments to the PR'
+inputs:
+  repo_token: # id of input
+    description: 'GITHUB_TOKEN'
+    required: true
 outputs:
   time: # id of output
     description: 'The time we greeted you'

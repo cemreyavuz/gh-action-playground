@@ -1,0 +1,20 @@
+name: Create PR
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: A job to create PR
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Create PR action step
+        uses: ./.github/actions/create-pr
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}

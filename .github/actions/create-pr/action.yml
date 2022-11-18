@@ -1,0 +1,9 @@
+name: 'Create PR'
+description: 'Creates a PR'
+inputs:
+  repo_token: # id of input
+    description: 'GITHUB_TOKEN'
+    required: true
+runs:
+  using: 'node16'
+  main: './dist/index.js'

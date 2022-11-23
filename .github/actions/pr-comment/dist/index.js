@@ -9696,7 +9696,59 @@ async function run() {
     const github_token = core.getInput("repo_token");
     const octokit = github.getOctokit(github_token);
 
-    const comments = await octokit.rest.issues
+    const { data: commits } = await octokit.rest.pulls.listCommits({
+      owner: github.context.issue.owner,
+      repo: github.context.issue.repo,
+      pull_number: github.context.issue.number,
+    });
+
+    console.log(commits);
+
+    commits[0];
+
+    const { data: file } = await octokit.rest.repos.getContent({
+      owner: github.context.issue.owner,
+      repo: github.context.issue.repo,
+      path: "src/pr-comment/index.js",
+      ref: commits[0].sha,
+    });
+
+    const content = file.content;
+    const b = new Buffer(content, 'base64')
+    const decoded = b.toString();
+
+    console.log(decoded);
+
+    const files = await octokit.rest.pulls.listFiles({
+      owner: github.context.issue.owner,
+      repo: github.context.issue.repo,
+      pull_number: github.context.issue.number,
+    }).then((res) => res.data);
+
+    console.log(files);
+
+    /* files.forEach(({ patch }) => {
+      const lines = patch.split('\n');
+      console.log(lines);
+
+      const filtered = lines.filter(
+        (line) => line.startsWith("+") || line.startsWith("-")
+      );
+      console.log(filtered);
+    }); */
+
+    const fileData = files[0];
+
+    const { data: fileContent } = await octokit.rest.repos.getContent({
+      owner: github.context.issue.owner,
+      repo: github.context.issue.repo,
+      path: fileData.filename,
+      ref: fileData.sha,
+    });
+
+    console.log(fileContent);
+
+    /* const comments = await octokit.rest.issues
       .listComments({
         owner: github.context.issue.owner,
         repo: github.context.issue.repo,
@@ -9722,7 +9774,7 @@ async function run() {
 
     const commentBody = `
 ${GH_ACTION_PLAYGROUND_COMMENT_HEADER}
-I can comment on PRs!
+I can comment on PRs! (But I also can delete previous comments by me)
     `;
 
     await octokit.rest.issues.createComment({
@@ -9730,7 +9782,7 @@ I can comment on PRs!
       repo: github.context.issue.repo,
       issue_number: github.context.issue.number,
       body: commentBody,
-    });
+    }); */
   } catch (error) {
     core.setFailed(error.message);
   }

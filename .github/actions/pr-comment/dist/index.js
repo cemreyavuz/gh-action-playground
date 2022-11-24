@@ -9707,31 +9707,64 @@ async function run() {
     const parentSHA = commits[0].parents[0].sha;
     const lastCommit = commits[commits.length - 1];
 
-    const { data: file } = await octokit.rest.repos.getContent({
-      owner: github.context.issue.owner,
-      repo: github.context.issue.repo,
-      path: FILE_NAME, // FIXME: use original file name
-      ref: lastCommit.sha,
+    let updatedFileContent = {};
+    try {
+      const { data: file } = await octokit.rest.repos.getContent({
+        owner: github.context.issue.owner,
+        repo: github.context.issue.repo,
+        path: FILE_NAME, // FIXME: use original file name
+        ref: lastCommit.sha,
+      });
+  
+      const content = file.content;
+      const b = new Buffer(content, 'base64')
+      const decoded = b.toString();
+  
+      updatedFileContent = JSON.parse(decoded);
+    } catch (error) {
+      console.error(error);
+    }
+
+    let originalFileContent = {};
+    try {
+      const { data: file2 } = await octokit.rest.repos.getContent({
+        owner: github.context.issue.owner,
+        repo: github.context.issue.repo,
+        path: FILE_NAME, // FIXME: use original file name
+        ref: parentSHA,
+      });
+  
+      const content2 = file2.content;
+      const b2 = new Buffer(content2, 'base64')
+      const decoded2 = b2.toString();
+      
+      originalFileContent = JSON.parse(decoded2);
+    } catch (error) {
+      console.error(error);
+    }
+
+    console.log(updatedFileContent);
+    console.log(originalFileContent);
+
+    const updatedKeys = Object.keys(updatedFileContent).filter((key) => {
+      const updatedValue = updatedFileContent[key];
+      const originalValue = originalFileContent[key];
+
+      return (
+        key in updatedFileContent &&
+        key in originalFileContent &&
+        updatedValue !== originalValue
+      );
     });
 
-    const content = file.content;
-    const b = new Buffer(content, 'base64')
-    const decoded = b.toString();
+    console.log(updatedKeys);
 
-    console.log(decoded);
-
-    const { data: file2 } = await octokit.rest.repos.getContent({
-      owner: github.context.issue.owner,
-      repo: github.context.issue.repo,
-      path: FILE_NAME, // FIXME: use original file name
-      ref: parentSHA,
-    });
-
-    const content2 = file2.content;
-    const b2 = new Buffer(content2, 'base64')
-    const decoded2 = b2.toString();
-
-    console.log(decoded2);
+    if (updatedKeys.length > 0) {
+      const latestKeys = await fetch(
+        "https://api.locize.app/4251ca4a-ae2a-4bf9-aca1-33288e8507e4/latest/en/gh-action"
+      );
+      console.log(latestKeys);
+    }
 
     const files = await octokit.rest.pulls.listFiles({
       owner: github.context.issue.owner,

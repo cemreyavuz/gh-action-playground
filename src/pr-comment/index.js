@@ -5,6 +5,8 @@ const GH_ACTION_PLAYGROUND_BOT_NAME = "github-actions[bot]";
 const GH_ACTION_PLAYGROUND_COMMENT_KEY = "GH_ACTION_PLAYGROUND_KEY";
 const GH_ACTION_PLAYGROUND_COMMENT_HEADER = `<!--- ${GH_ACTION_PLAYGROUND_COMMENT_KEY} -->`;
 
+const FILE_NAME = "test.json";
+
 async function run() {
   try {
     const github_token = core.getInput("repo_token");
@@ -15,16 +17,15 @@ async function run() {
       repo: github.context.issue.repo,
       pull_number: github.context.issue.number,
     });
-
-    console.log(commits);
-
-    commits[0];
+    
+    const parentSHA = commits[0].parents[0].sha;
+    const lastCommit = commits[commits.length - 1];
 
     const { data: file } = await octokit.rest.repos.getContent({
       owner: github.context.issue.owner,
       repo: github.context.issue.repo,
-      path: "src/pr-comment/index.js",
-      ref: commits[0].sha,
+      path: FILE_NAME, // FIXME: use original file name
+      ref: lastCommit.sha,
     });
 
     const content = file.content;
@@ -33,13 +34,26 @@ async function run() {
 
     console.log(decoded);
 
+    const { data: file2 } = await octokit.rest.repos.getContent({
+      owner: github.context.issue.owner,
+      repo: github.context.issue.repo,
+      path: FILE_NAME, // FIXME: use original file name
+      ref: parentSHA,
+    });
+
+    const content2 = file2.content;
+    const b2 = new Buffer(content2, 'base64')
+    const decoded2 = b2.toString();
+
+    console.log(decoded2);
+
     const files = await octokit.rest.pulls.listFiles({
       owner: github.context.issue.owner,
       repo: github.context.issue.repo,
       pull_number: github.context.issue.number,
     }).then((res) => res.data);
 
-    console.log(files);
+    console.log(files.map(({ filename }) => filename));
 
     /* files.forEach(({ patch }) => {
       const lines = patch.split('\n');
@@ -50,17 +64,6 @@ async function run() {
       );
       console.log(filtered);
     }); */
-
-    const fileData = files[0];
-
-    const { data: fileContent } = await octokit.rest.repos.getContent({
-      owner: github.context.issue.owner,
-      repo: github.context.issue.repo,
-      path: fileData.filename,
-      ref: fileData.sha,
-    });
-
-    console.log(fileContent);
 
     /* const comments = await octokit.rest.issues
       .listComments({
